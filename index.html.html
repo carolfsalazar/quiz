@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Off Campus Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Fredoka One';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Fredoka One'), local('FredokaOne-Regular');
+  }
+</style>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
+  background: #f0ece4;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem 1rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+.sticker {
+  position: fixed; font-size: 28px; opacity: 0.45;
+  pointer-events: none; user-select: none;
+  animation: float 6s ease-in-out infinite;
+}
+.sticker:nth-child(1) { top:4%;  left:3%;  font-size:30px; animation-delay:0s; }
+.sticker:nth-child(2) { top:14%; right:4%; font-size:22px; animation-delay:1s; }
+.sticker:nth-child(3) { top:32%; left:1%;  font-size:20px; animation-delay:2s; }
+.sticker:nth-child(4) { top:52%; right:2%; font-size:26px; animation-delay:0.5s; }
+.sticker:nth-child(5) { top:68%; left:2%;  font-size:20px; animation-delay:3s; }
+.sticker:nth-child(6) { top:80%; right:3%; font-size:26px; animation-delay:1.5s; }
+.sticker:nth-child(7) { top:88%; left:5%;  font-size:16px; animation-delay:2.5s; }
+.sticker:nth-child(8) { top:22%; left:7%;  font-size:16px; animation-delay:4s; }
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+.card {
+  width: 100%; max-width: 520px;
+  position: relative;
+}
+
+/* ===== CAPA — estilo caderno ===== */
+#cover {
+  background: #fff9f0;
+  border: 3px solid #1a1a2e;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 5px 5px 0 #1a1a2e;
+  position: relative;
+}
+.cover-spine {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 14px; background: #ff6eb4; border-right: 3px solid #1a1a2e; z-index: 2;
+}
+.cover-holes {
+  position: absolute; left: 5px; top: 0; bottom: 0;
+  display: flex; flex-direction: column; justify-content: space-evenly; z-index: 3;
+}
+.cover-hole {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #fff9f0; border: 1px solid rgba(0,0,0,0.2);
+}
+.cover-lines {
+  position: absolute; top: 0; left: 14px; right: 0; bottom: 0;
+  background: repeating-linear-gradient(180deg, transparent 0, transparent 27px, #e8dfd4 27px, #e8dfd4 28px);
+  pointer-events: none; z-index: 0;
+}
+.cover-inner {
+  position: relative; z-index: 1;
+  padding: 1.75rem 1.5rem 1.75rem 2.25rem;
+}
+.cover-stickers { font-size: 22px; margin-bottom: 12px; }
+.cover-pill {
+  display: inline-block; background: #ffe066;
+  border: 2px solid #1a1a2e; border-radius: 6px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 2px 10px; color: #1a1a2e;
+  margin-bottom: 10px; transform: rotate(-1.5deg);
+}
+.cover-h1 {
+  font-family: 'Fredoka One', 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+  font-size: 46px; color: #1a1a2e; line-height: 1; margin-bottom: 8px;
+}
+.cover-underline { height: 3px; background: #ff6eb4; border-radius: 2px; margin-bottom: 12px; }
+.cover-sub {
+  font-size: 13px; font-weight: 700; color: #555;
+  line-height: 1.65; margin-bottom: 1.25rem;
+}
+.name-label {
+  display: block; font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: #888; margin-bottom: 6px;
+}
+.name-input {
+  width: 100%; padding: 11px 14px;
+  font-size: 15px; font-weight: 700; font-family: 'Nunito', sans-serif;
+  color: #1a1a2e; background: #fff;
+  border: 2.5px solid #1a1a2e; border-radius: 10px;
+  box-shadow: 3px 3px 0 #b5a4f7; outline: none;
+  transition: box-shadow 0.15s; margin-bottom: 1rem;
+}
+.name-input:focus { box-shadow: 3px 3px 0 #ff6eb4; }
+.name-input::placeholder { color: #bbb; font-weight: 600; }
+.btn-start {
+  width: 100%; background: #1a1a2e; color: #fff;
+  border: 3px solid #1a1a2e; border-radius: 14px; padding: 14px;
+  font-family: 'Fredoka One', cursive; font-size: 18px;
+  letter-spacing: 1px; cursor: pointer;
+  box-shadow: 4px 4px 0 #ff6eb4;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-start:hover { transform: translate(2px,2px); box-shadow: 2px 2px 0 #ff6eb4; }
+
+/* ===== QUIZ ===== */
+#quiz-area {
+  display: none;
+  background: #fff;
+  border: 3px solid #1a1a2e;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 5px 5px 0 #1a1a2e;
+}
+.washi {
+  height: 13px;
+  background: repeating-linear-gradient(90deg,#ff6eb4 0,#ff6eb4 18px,#fff 18px,#fff 22px,#a8e6cf 22px,#a8e6cf 40px,#fff 40px,#fff 44px,#ffe066 44px,#ffe066 62px,#fff 62px,#fff 66px,#b5a4f7 66px,#b5a4f7 84px,#fff 84px,#fff 88px);
+  border-bottom: 2px solid #1a1a2e;
+}
+.quiz-inner { padding: 1.5rem 1.75rem 1.75rem; }
+
+.progress-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.prog-label { font-size: 12px; font-weight: 700; color: #888; }
+.prog-label b { color: #1a1a2e; }
+.prog-track { display: flex; gap: 4px; margin-bottom: 1.5rem; }
+.prog-pip {
+  flex: 1; height: 8px; border-radius: 99px;
+  background: #eee; border: 1.5px solid #ddd; transition: background 0.3s;
+}
+.prog-pip.done { background: #ff6eb4; border-color: #ff6eb4; }
+.prog-pip.current { background: #ffe066; border-color: #c8a800; }
+
+.q-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #b5a4f7; margin-bottom: 6px;
+}
+.q-box {
+  background: #fdf6e3; border: 2px solid #1a1a2e; border-radius: 12px;
+  padding: 13px 15px; margin-bottom: 1.25rem; box-shadow: 3px 3px 0 #e0d5c0;
+}
+.q-box p { font-size: 15px; font-weight: 700; color: #1a1a2e; line-height: 1.55; }
+
+.options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 1.25rem; }
+.opt {
+  background: #fff; border: 2px solid #1a1a2e; border-radius: 12px;
+  padding: 12px 14px; font-size: 14px; font-weight: 700; color: #1a1a2e;
+  cursor: pointer; text-align: left; transition: all 0.15s;
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Nunito', sans-serif; box-shadow: 2px 2px 0 #e0d5c0;
+}
+.opt:hover:not(:disabled) {
+  background: #f0ebff; border-color: #b5a4f7;
+  transform: translate(-1px,-1px); box-shadow: 3px 3px 0 #b5a4f7;
+}
+.opt .letter {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: #f0f0f0; border: 1.5px solid #ccc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0; color: #888;
+}
+.opt.correct { background: #a8e6cf; border-color: #1a1a2e; box-shadow: 3px 3px 0 #1a1a2e; }
+.opt.correct .letter { background: #1a1a2e; color: #a8e6cf; border-color: #1a1a2e; }
+.opt.wrong { background: #ffb3c6; border-color: #1a1a2e; box-shadow: 3px 3px 0 #1a1a2e; }
+.opt.wrong .letter { background: #1a1a2e; color: #ffb3c6; border-color: #1a1a2e; }
+.opt.reveal { background: #a8e6cf; border-color: #1a1a2e; box-shadow: 3px 3px 0 #1a1a2e; }
+.opt.reveal .letter { background: #1a1a2e; color: #a8e6cf; border-color: #1a1a2e; }
+.opt:disabled { cursor: default; transform: none; }
+
+.feedback {
+  border-radius: 10px; padding: 10px 13px; font-size: 12.5px;
+  font-weight: 600; line-height: 1.6; display: none; margin-bottom: 1rem;
+  border: 2px dashed;
+}
+.feedback.show { display: block; }
+.feedback.correct { background: #e8faf2; border-color: #6bcfa0; color: #1a5c3a; }
+.feedback.wrong   { background: #fff0f3; border-color: #ff8fab; color: #7a1a2e; }
+
+.quiz-footer { display: flex; align-items: center; justify-content: space-between; }
+.score-badge {
+  background: #ffe066; border: 2px solid #1a1a2e; border-radius: 100px;
+  padding: 5px 12px; font-size: 12px; font-weight: 800; color: #1a1a2e;
+}
+.btn-next {
+  background: #ff6eb4; color: #fff; border: 2.5px solid #1a1a2e;
+  border-radius: 12px; padding: 10px 22px;
+  font-family: 'Fredoka One', cursive; font-size: 16px;
+  cursor: pointer; box-shadow: 3px 3px 0 #1a1a2e;
+  display: none; letter-spacing: 0.5px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-next.show { display: block; }
+.btn-next:hover { transform: translate(1px,1px); box-shadow: 2px 2px 0 #1a1a2e; }
+
+/* ===== RESULTADO ===== */
+#result {
+  display: none;
+  background: #fff;
+  border: 3px solid #1a1a2e;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 5px 5px 0 #1a1a2e;
+}
+.result-inner { padding: 1.75rem; text-align: center; }
+.result-eyebrow {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #888; margin-bottom: 1rem;
+}
+.result-stickers { font-size: 32px; margin-bottom: 1rem; }
+.result-persona-box {
+  border: 3px solid #1a1a2e; border-radius: 16px;
+  padding: 1.25rem; text-align: center; margin-bottom: 1rem;
+  box-shadow: 4px 4px 0 #1a1a2e; position: relative;
+}
+.result-tag {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  background: #ffe066; border: 2px solid #1a1a2e; border-radius: 100px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 12px; white-space: nowrap; color: #1a1a2e;
+}
+.result-persona-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: 36px; letter-spacing: 2px; color: #fff;
+  text-shadow: 2px 2px 0 #1a1a2e; margin-bottom: 2px;
+}
+.result-persona-sub { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.result-score-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px; margin: 1rem 0;
+}
+.result-score-badge {
+  background: #ffe066; border: 2.5px solid #1a1a2e; border-radius: 100px;
+  font-size: 11px; font-weight: 800; padding: 4px 10px; color: #1a1a2e;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.result-score-num { font-family: 'Fredoka One', cursive; font-size: 38px; color: #1a1a2e; }
+.result-desc {
+  background: #fdf6e3; border: 2px dashed #ccc; border-radius: 12px;
+  padding: 12px 14px; font-size: 13px; font-weight: 600;
+  color: #444; line-height: 1.65; text-align: center; margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* diploma */
+.diploma {
+  border: 3px solid #1a1a2e; border-radius: 16px;
+  overflow: hidden; margin-bottom: 1.25rem;
+  box-shadow: 4px 4px 0 #1a1a2e;
+}
+.diploma-washi {
+  height: 12px;
+  background: repeating-linear-gradient(90deg,#ff6eb4 0,#ff6eb4 18px,#fff 18px,#fff 22px,#a8e6cf 22px,#a8e6cf 40px,#fff 40px,#fff 44px,#ffe066 44px,#ffe066 62px,#fff 62px,#fff 66px,#b5a4f7 66px,#b5a4f7 84px,#fff 84px,#fff 88px);
+}
+.diploma-inner { background: #fdf6e3; padding: 1.5rem 1.25rem; text-align: center; }
+.diploma-seal { font-size: 36px; margin-bottom: 6px; }
+.diploma-header {
+  font-family: 'Fredoka One', cursive; font-size: 20px;
+  color: #1a1a2e; letter-spacing: 2px; margin-bottom: 2px;
+}
+.diploma-sub { font-size: 10px; font-weight: 700; color: #888; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.diploma-divider { height: 1.5px; background: repeating-linear-gradient(90deg,#1a1a2e 0,#1a1a2e 6px,transparent 6px,transparent 10px); margin: 10px 0; }
+.diploma-body { font-size: 13px; font-weight: 600; color: #444; line-height: 1.8; }
+.diploma-player-name {
+  font-family: 'Fredoka One', cursive; font-size: 22px; color: #ff6eb4;
+  text-shadow: 1px 1px 0 #1a1a2e; margin: 4px 0;
+}
+.diploma-persona-name {
+  font-size: 12px; font-weight: 800; color: #b5a4f7; margin-top: 2px;
+}
+.diploma-footer-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 14px; gap: 8px; }
+.diploma-sig { flex: 1; text-align: center; }
+.diploma-sig-line { height: 1.5px; background: #1a1a2e; margin-bottom: 4px; }
+.diploma-sig-label { font-size: 10px; font-weight: 700; color: #555; line-height: 1.5; }
+.diploma-sig-label span { color: #888; font-weight: 600; }
+.diploma-stamp {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 3px solid #1a1a2e; background: #b5a4f7;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0; box-shadow: 2px 2px 0 #1a1a2e;
+}
+
+.btn-retry {
+  width: 100%; background: #1a1a2e; color: #fff;
+  border: 2.5px solid #1a1a2e; border-radius: 12px;
+  padding: 13px; font-family: 'Fredoka One', cursive; font-size: 16px;
+  cursor: pointer; box-shadow: 3px 3px 0 #b5a4f7;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-retry:hover { transform: translate(1px,1px); box-shadow: 2px 2px 0 #b5a4f7; }
+</style>
+</head>
+<body>
+
+<div class="sticker">🏒</div>
+<div class="sticker">⭐</div>
+<div class="sticker">🎵</div>
+<div class="sticker">💜</div>
+<div class="sticker">🧊</div>
+<div class="sticker">🌸</div>
+<div class="sticker">🏆</div>
+<div class="sticker">✨</div>
+
+<div class="card">
+
+  <!-- CAPA -->
+  <div id="cover">
+    <div class="cover-spine"></div>
+    <div class="cover-holes">
+      <div class="cover-hole"></div>
+      <div class="cover-hole"></div>
+      <div class="cover-hole"></div>
+    </div>
+    <div class="cover-lines"></div>
+    <div class="cover-inner">
+      <div class="cover-stickers">🏒 ⭐ 🎵 💜</div>
+      <div class="cover-pill">✦ off campus quiz ✦</div>
+      <h1 class="cover-h1">OFF<br>CAMPUS</h1>
+      <div class="cover-underline"></div>
+      <div class="cover-sub">teste seus conhecimentos e descubra qual personagem da Briar U combina com você!</div>
+      <label class="name-label">seu nome</label>
+      <input class="name-input" id="player-name" type="text" placeholder="escreve aqui..." maxlength="28" />
+      <button class="btn-start" onclick="startQuiz()">BORA JOGAR ♥</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-area">
+    <div class="washi"></div>
+    <div class="quiz-inner">
+      <div class="progress-row">
+        <span class="prog-label">pergunta <b id="q-cur">1</b> de <b>15</b></span>
+        <span class="prog-label"><b id="score-label">0</b> acertos</span>
+      </div>
+      <div class="prog-track" id="prog-track"></div>
+      <div class="q-label" id="q-label">pergunta #01</div>
+      <div class="q-box"><p id="q-text"></p></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="quiz-footer">
+        <div class="score-badge" id="score-badge">0 / 15</div>
+        <button class="btn-next" id="next-btn">confirmar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="result">
+    <div class="washi"></div>
+    <div class="result-inner">
+      <div class="result-eyebrow">✦ resultado final ✦</div>
+      <div class="result-stickers" id="r-stickers"></div>
+      <div class="result-persona-box" id="r-persona-box">
+        <div class="result-tag">seu match é</div>
+        <div class="result-persona-name" id="r-persona-name"></div>
+        <div class="result-persona-sub" id="r-persona-sub"></div>
+      </div>
+      <div class="result-score-row">
+        <div class="result-score-badge">score</div>
+        <div class="result-score-num" id="r-score"></div>
+      </div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="diploma">
+        <div class="diploma-washi"></div>
+        <div class="diploma-inner">
+          <div class="diploma-seal">🏒</div>
+          <div class="diploma-header">BRIAR UNIVERSITY</div>
+          <div class="diploma-sub">Departamento de Hóquei & Coração Partido</div>
+          <div class="diploma-divider"></div>
+          <div class="diploma-body">
+            Este diploma certifica que
+            <div class="diploma-player-name" id="diploma-player-name"></div>
+            concluiu com <span id="diploma-honor"></span> a<br>
+            <strong>1ª Temporada de Off Campus</strong><br>
+            e é oficialmente uma aluna da Briar University.<br>
+            <div class="diploma-persona-name" id="diploma-persona-name"></div>
+          </div>
+          <div class="diploma-divider"></div>
+          <div class="diploma-footer-row">
+            <div class="diploma-sig">
+              <div class="diploma-sig-line"></div>
+              <div class="diploma-sig-label">Garrett Graham<br><span>Capitão do Time</span></div>
+            </div>
+            <div class="diploma-stamp" id="diploma-stamp"></div>
+            <div class="diploma-sig">
+              <div class="diploma-sig-line"></div>
+              <div class="diploma-sig-label">Hannah Wells<br><span>Compositora Oficial</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="diploma-washi"></div>
+      </div>
+      <button class="btn-retry" onclick="restart()">jogar de novo ↺</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const qs = [
+  { q:"Qual é o acordo que Hannah e Garrett fecham no início da série?", opts:["Hannah escreve músicas para Garrett em troca de tutoria","Hannah tutora Garrett nas notas em troca de um namoro falso para conquistar Justin","Hannah entra no time de torcida em troca de aulas particulares","Garrett a ajuda no concurso musical em troca de favores acadêmicos"], ans:1, fb:"✓ Exato! Hannah tutora Garrett, ele oferece um namoro falso pra ajudá-la a conquistar Justin — e aí o plano desanda do jeito mais gostoso possível.", fbw:"✗ O acordo é: Hannah tutora Garrett academicamente, e ele oferece um namoro falso para ajudá-la a conquistar Justin." },
+  { q:"Na série, qual é o perfil de Justin — diferente do livro original?", opts:["Jogador de basquete","Jogador de futebol americano","Músico com a própria banda","Estudante de artes visuais"], ans:2, fb:"✓ Certo! Na série Justin é músico e tem a banda After Hours — o que justifica ainda mais o interesse de Hannah.", fbw:"✗ Na série, Justin virou músico com a banda After Hours. No livro, ele era jogador de futebol americano." },
+  { q:"Qual subplot a série adicionou vindo do 3º livro (The Score) à história de The Deal?", opts:["A cena do concurso de música solo","O romance entre Allie Hayes e Dean Di Laurentis","O trauma do passado de Hannah","A suspensão de Garrett do time"], ans:1, fb:"✓ Isso! A série antecipou o romance Allie & Dean, que nos livros só aparece no 3º volume.", fbw:"✗ A inclusão foi o romance entre Allie Hayes e Dean Di Laurentis, que nos livros aparece só em The Score." },
+  { q:"Quando Hannah flagra Garrett com outra garota e vai embora, como ela sai na série?", opts:["De bicicleta","A pé, chorando","De patinete","De carro com Allie"], ans:0, fb:"✓ Certinho! Na série ela sai de bicicleta — no livro original ela vai embora de carro.", fbw:"✗ Na série ela sai de bicicleta. No livro original, Hannah vai embora de carro." },
+  { q:"Qual cena inteiramente inédita — sem correspondente nos livros — domina o ep. 4?", opts:["A festa de Halloween da república","A encenação bêbada de 'Sonho de Uma Noite de Verão'","O jantar na casa dos pais de Garrett","A partida final do campeonato"], ans:1, fb:"✓ Perfeito! A cena do 'Shakespeare Bêbado' ocupa boa parte do ep 4 e não existe de nenhuma forma nos livros.", fbw:"✗ Foi a cena do 'Shakespeare Bêbado' — uma encenação de Sonho de Uma Noite de Verão totalmente original." },
+  { q:"Na série, por que Hannah e Garrett terminam — diferente do que acontece no livro?", opts:["O pai de Garrett chantageou Hannah","Garrett reage mal ao trauma do passado de Hannah","Hannah descobre que o acordo foi mentira","Garrett é transferido para outro time"], ans:1, fb:"✓ Isso! A série coloca o peso na reação emocional de Garrett. No livro, o pai vilão é quem chantageia Hannah.", fbw:"✗ Na série, a separação gira em torno da reação de Garrett ao trauma de Hannah. No livro, o pai de Garrett chantageia ela." },
+  { q:"Qual personagem do livro foi excluído da série e substituído por Dexter?", opts:["Cass, parceiro egocêntrico de Hannah no festival","Nell, colega de sala e amiga de Hannah","Phil, ex-namorado de Allie","Marcus, rival de Garrett no time"], ans:1, fb:"✓ Certo! Nell, a amiga de Hannah no livro, não aparece na série. Dexter ocupa esse espaço.", fbw:"✗ Quem foi excluída foi Nell, amiga de Hannah no livro. Na série, Dexter toma esse lugar." },
+  { q:"Na série, o concurso musical tem qual formato — diferente do livro?", opts:["Batalha de bandas ao vivo","Composição individual","Dupla obrigatória com outro estudante","Produção de um EP completo"], ans:1, fb:"✓ Na série é composição solo. No livro, o festival exigia duplas e Hannah tinha Cass como parceiro problemático.", fbw:"✗ Na série o concurso é de composição individual. No livro, era em dupla e Hannah precisava lidar com Cass." },
+  { q:"Qual é o nome da banda de Justin na série?", opts:["The Bruins","After Hours","Midnight Puck","Briar Sound"], ans:1, fb:"✓ Isso! A banda de Justin se chama After Hours — detalhe que reforça a conexão musical entre ele e Hannah.", fbw:"✗ A banda de Justin se chama After Hours. É ela que cria o ponto de contato musical entre os dois." },
+  { q:"O que Garrett faz quando descobre o trauma do passado de Hannah?", opts:["Apoia ela imediatamente e pedem para reatar","Reage de forma exagerada, o que acaba causando o término","Conta para os amigos sem permissão dela","Desaparece sem dar satisfação"], ans:1, fb:"✓ Exato! A reação desproporcional de Garrett é o pivô do término na série — diferente do livro, onde o pai vilão é quem chantageia.", fbw:"✗ Na série, Garrett reage de forma exagerada ao trauma de Hannah — e é isso que provoca o término entre eles." },
+  { q:"Qual recurso narrativo a série usa para conectar os personagens ao longo dos episódios?", opts:["Um álbum de vinil que passa de mão em mão","A trilha sonora como fio condutor entre os arcos","Uma playlist compartilhada por Hannah e Allie","As composições de Hannah em momentos-chave dos outros personagens"], ans:1, fb:"✓ Isso! A trilha sonora é uma das apostas criativas da série — ela conecta os personagens e reforça os momentos emocionais.", fbw:"✗ É a trilha sonora que cumpre esse papel de fio condutor entre os personagens ao longo dos episódios." },
+  { q:"Qual time de hóquei profissional é citado dentro do universo da série?", opts:["New York Rangers","Boston Bruins","Chicago Blackhawks","Toronto Maple Leafs"], ans:1, fb:"✓ Isso! O Boston Bruins é mencionado — um detalhe que fãs atentos notaram logo.", fbw:"✗ O time citado é o Boston Bruins. Um detalhe pequeno, mas que fãs atentos captaram!" },
+  { q:"O que Hannah busca ao se aproximar de Justin no início da série?", opts:["Uma parceria para o concurso de composição","Um namorado para deixar Garrett com ciúmes","Um empréstimo de material de aula","Indicação para uma vaga no coral da faculdade"], ans:0, fb:"✓ Certo! Hannah se aproxima de Justin querendo ajuda para o concurso de composição — e Garrett usa isso como moeda de troca no acordo.", fbw:"✗ Hannah se aproxima de Justin buscando parceria para o concurso de composição musical da faculdade." },
+  { q:"Qual é o maior obstáculo no arco de Dean e Allie ao longo da temporada?", opts:["Allie está de intercâmbio e vai embora","Dean tem dificuldade em assumir um relacionamento sério","Os dois estão apaixonados por outras pessoas","O time proíbe relacionamentos durante a temporada"], ans:1, fb:"✓ Exato! Dean é o clássico 'não quer compromisso' — e superar isso é o coração do arco dele com Allie.", fbw:"✗ O obstáculo central é que Dean tem dificuldade em se comprometer com um relacionamento sério." },
+  { q:"Em qual livro da saga a 2ª temporada já confirmada será baseada?", opts:["The Score","The Goal","The Mistake","The Legacy"], ans:2, fb:"✓ Perfeito! A 2ª temporada adapta The Mistake — focando no romance de Logan.", fbw:"✗ A 2ª temporada será baseada em The Mistake, focando no arco do Logan." }
+];
+
+const PERSONA = [
+  { min:13, name:'HANNAH', sub:'wells ♡', color:'#b5a4f7', stickers:'📚✨🎵', desc:'"dedicada, detalhista e sempre certa" — você absorveu cada cena, cada detalhe, cada diferença do livro. a Briar U te conhece de cor.', honor:'louvor e distinção', stamp:'🏆' },
+  { min:10, name:'GARRETT', sub:'graham ♡', color:'#ff6eb4', stickers:'🏒⭐🏆', desc:'"talentoso, gentil, quase perfeito" — você manda muito bem e conhece a série de verdade. só escaparam alguns detalhes mais específicos.', honor:'mérito acadêmico', stamp:'⭐' },
+  { min:6,  name:'JUSTIN',  sub:'kohl ♡',   color:'#a8e6cf', stickers:'🎤🎵🎸', desc:'"presente, mas às vezes distraído" — você curtiu a série, se envolveu com a história, mas alguns detalhes passaram batido. uma segunda maratona resolve!', honor:'aprovação', stamp:'🎵' },
+  { min:0,  name:'DEAN',   sub:'di laurentis ♡', color:'#ffe066', stickers:'🛼😎💫', desc:'"charmoso, mas ainda descobrindo tudo" — você mal chegou no campus! vai lá assistir a 1ª temporada com calma e volta aqui pra arrebentar.', honor:'participação corajosa', stamp:'🛼' }
+];
+
+const letters = ['A','B','C','D'];
+let cur = 0, score = 0, answered = false, playerName = '';
+const TOTAL = qs.length;
+
+function buildPips() {
+  const t = document.getElementById('prog-track');
+  t.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-pip' + (i < cur ? ' done' : i === cur ? ' current' : '');
+    t.appendChild(d);
+  }
+}
+
+function startQuiz() {
+  const input = document.getElementById('player-name').value.trim();
+  if (!input) {
+    const el = document.getElementById('player-name');
+    el.style.borderColor = '#ff6eb4';
+    el.placeholder = 'coloca seu nome primeiro! 💜';
+    return;
+  }
+  playerName = input;
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  render();
+}
+
+function render() {
+  const q = qs[cur];
+  document.getElementById('q-cur').textContent = cur + 1;
+  document.getElementById('q-label').textContent = `pergunta #${String(cur+1).padStart(2,'0')}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('score-label').textContent = score;
+  document.getElementById('score-badge').textContent = `${score} / ${TOTAL}`;
+  buildPips();
+  const box = document.getElementById('options');
+  box.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span class="letter">${letters[i]}</span>${o}`;
+    b.onclick = () => pick(i);
+    box.appendChild(b);
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback'; fb.textContent = '';
+  document.getElementById('next-btn').className = 'btn-next';
+  answered = false;
+}
+
+function pick(i) {
+  if (answered) return;
+  answered = true;
+  const q = qs[cur];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(b => b.disabled = true);
+  const ok = i === q.ans;
+  if (ok) score++;
+  opts[i].classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) opts[q.ans].classList.add('reveal');
+  document.getElementById('score-label').textContent = score;
+  document.getElementById('score-badge').textContent = `${score} / ${TOTAL}`;
+  const fb = document.getElementById('feedback');
+  fb.textContent = ok ? q.fb : q.fbw;
+  fb.className = 'feedback show ' + (ok ? 'correct' : 'wrong');
+  document.getElementById('next-btn').className = 'btn-next show';
+}
+
+document.getElementById('next-btn').onclick = () => {
+  cur++;
+  if (cur < TOTAL) { render(); } else { showResult(); }
+};
+
+function showResult() {
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  const p = PERSONA.find(x => score >= x.min);
+  document.getElementById('r-stickers').textContent = p.stickers;
+  document.getElementById('r-persona-name').textContent = p.name;
+  document.getElementById('r-persona-sub').textContent = p.sub;
+  document.getElementById('r-score').textContent = `${score}/${TOTAL}`;
+  document.getElementById('r-desc').textContent = p.desc;
+  document.getElementById('r-persona-box').style.background = p.color;
+  document.getElementById('diploma-player-name').textContent = playerName;
+  document.getElementById('diploma-persona-name').textContent = `perfil: ${p.name.toLowerCase()} ${p.sub}`;
+  document.getElementById('diploma-honor').textContent = p.honor;
+  document.getElementById('diploma-stamp').textContent = p.stamp;
+}
+
+function restart() {
+  cur = 0; score = 0; answered = false; playerName = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('cover').style.display = 'block';
+  document.getElementById('player-name').value = '';
+}
+</script>
+</body>
+</html>
